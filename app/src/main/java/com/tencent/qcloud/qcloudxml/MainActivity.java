@@ -3,6 +3,7 @@ package com.tencent.qcloud.qcloudxml;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -90,5 +91,98 @@ public class MainActivity extends AppCompatActivity {
         TextView tv_to = findViewById(R.id.tv_to);
         tv_to.setText(xmlTo);
         Log.d("qjd", xmlTo);
+
+        findViewById(R.id.btnTest).setVisibility(View.GONE);
+//        findViewById(R.id.btnTest).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                test();
+//            }
+//        });
     }
+
+    private void test(){
+        String xml = "\n" +
+                "<TestBeana>\n" +
+                "  <Aab>aaa</Aab>\n" +
+                "  <Bbb>3</Bbb>\n" +
+                "  <ITestBean1>\n" +
+                "    <Iaaa>iaaaaaa</Iaaa>\n" +
+                "  </ITestBean1>\n" +
+                "  <ITestBean2List>\n" +
+                "    <ITestBean2>\n" +
+                "      <Ibbb>1</Ibbb>\n" +
+                "    </ITestBean2>\n" +
+                "    <ITestBean2>\n" +
+                "      <Ibbb>2</Ibbb>\n" +
+                "    </ITestBean2>\n" +
+                "    <ITestBean2>\n" +
+                "      <Ibbb>3</Ibbb>\n" +
+                "    </ITestBean2>\n" +
+                "  </ITestBean2List>\n" +
+                "</TestBeana>";
+
+//        @SuppressLint("ResourceType") InputStream inputStream = this.getResources().openRawResource(R.xml.test);
+
+        InputStream inputStream = new ByteArrayInputStream(xml.getBytes());
+        TestBean testBean = null;
+        try {
+            testBean = QCloudXml.fromXml(inputStream, TestBean.class);
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        long now = System.currentTimeMillis();
+        for (int i=0; i<10000; ++i) {
+            try {
+                QCloudXml.fromXml(inputStream, TestBean.class);
+            } catch (XmlPullParserException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        Log.d("time", "QCloudXml.fromXml use time="+(System.currentTimeMillis() - now));
+
+        now = System.currentTimeMillis();
+        for (int i=0; i<10000; ++i) {
+            try {
+                TestBean.parse(inputStream);
+            } catch (XmlPullParserException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        Log.d("time", "TestBean parse use time="+(System.currentTimeMillis() - now));
+
+
+        now = System.currentTimeMillis();
+        for (int i=0; i<10000; ++i) {
+            try {
+                QCloudXml.toXml(testBean);
+            } catch (XmlPullParserException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        Log.d("time", "QCloudXml.toXml use time="+(System.currentTimeMillis() - now));
+
+        now = System.currentTimeMillis();
+        for (int i=0; i<10000; ++i) {
+            try {
+                TestBean.build(testBean);
+            } catch (XmlPullParserException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        Log.d("time", "TestBean.build use time="+(System.currentTimeMillis() - now));
+    }
+
+
 }
